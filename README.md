@@ -1,73 +1,118 @@
-# React + TypeScript + Vite
+# Weather App (React + TypeScript)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Egyszerű időjárás-előrejelző web app, amely az **Open-Meteo** API-kat használja város kereséshez (Geocoding) és időjárás adatok lekéréséhez (Forecast).
 
-Currently, two official plugins are available:
+## Funkciók
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Város kiválasztása
+- A városnévre kattintva megnyílik egy **modal**.
+- A modalban található kereső az **Open-Meteo Geocoding API**-t használja.
+- Több találat esetén a felhasználó listából választhat.
+- Első megnyitáskor (ha nincs kiválasztott város) a modal automatikusan megjelenik.
+- A kiválasztott város adatai **localStorage**-ba mentésre kerülnek.
 
-## React Compiler
+Geocoding API:  
+- Open-Meteo Geocoding: https://open-meteo.com/en/docs/geocoding-api
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Adatok megjelenítése
+- Aktuális hőmérséklet és időjárás állapot (pl. tiszta idő, eső, stb.)
+- **7 napos előrejelzés**, amely tartalmazza:
+  - nap neve
+  - állapot ikon
+  - csapadék valószínűség
+  - minimum / maximum hőmérséklet
 
-## Expanding the ESLint configuration
+Forecast API:  
+- Open-Meteo Forecast: https://open-meteo.com/en/docs/
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Grafikon
+- Az előrejelzés alatt grafikonon megjelenik a napokra vonatkozó **legmagasabb (max) hőmérséklet**.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Design
+- A felület a megadott Figma design alapján készült:
+  - https://www.figma.com/file/zMVbPAOqbBfJ7vPwZct9WX/Id%C5%91j%C3%A1r%C3%A1s?type=design&node-id=0%3A1&mode=design&t=cqhWcADlq7Tg0gUH-1
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Tech stack
+- **React**
+- **TypeScript**
+- **Vite**
+- **Material UI (MUI)**
+- **TanStack Query** (adatlekérés, cache, request state kezelés)
+- **Recharts** (grafikon)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Telepítés és futtatás
+
+### Követelmények
+- Node.js (ajánlott: 18+)
+
+### Telepítés
+```bash
+npm install
 ```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Inditás
+``` bash
+npm run dev
 ```
+## Architektúra megközelítés
+
+- Az API hívások külön `api/` mappában találhatók.
+- TanStack Query kezeli az adatlekérést, cache-elést és loading/error state-et.
+- A város keresés debounced módon történik.
+- A localStorage kezelés egy dedikált custom hook segítségével történik.
+- A komponensek feature-alapú bontásban vannak szervezve.
+
+src/
+│
+├── api/
+│ ├── OpenMeteo.ts # API hívások (geocoding, forecast)
+│ └── QueryKeys.ts # TanStack query key factory
+│
+├── components/
+│ ├── CitySelectorModal/
+│ │ ├── CitySearch.tsx
+│ │ └── CitySelectorModal.tsx
+│ │
+│ ├── CurrentWeather/
+│ │ └── CurrentWeather.tsx
+│ │
+│ ├── WeeklyForecast/
+│ │ ├── WeeklyForecast.tsx
+│ │ └── WeatherIcons.tsx
+│ │
+│ └── ForecastChart/
+│ └── ForecastChart.tsx
+│
+├── hooks/
+│ ├── useCitySearch.ts
+│ ├── useDebouncedValue.ts
+│ ├── useForecast.ts
+│ └── useLocalStorageState.ts
+│
+├── pages/
+│ └── Home.tsx
+│
+├── Providers/
+│ └── QueryProvider.tsx
+│
+├── types/
+│ ├── City.ts
+│ └── ForecastTypes.ts
+│
+├── utils/
+│ └── WeatherCode.ts
+│
+└── App.tsx
+
+## Megjegyzés
+
+Bár a feladatkiírás nem írta elő a TypeScript használatát, a projektet tudatosan TypeScript-tel készítettem el.
+
+Ennek célja:
+- a típusbiztonság növelése
+- a jobb karbantarthatóság
+- az API válaszok strukturált kezelése
+- valamint a fejlesztői élmény javítása
+
+A teljes alkalmazás természetesen megvalósítható lett volna tisztán React használatával is, azonban a TypeScript alkalmazásával szerettem volna demonstrálni hogyha szükséges azt is ismerem.
+
+*Lisóczki Nikolett*
