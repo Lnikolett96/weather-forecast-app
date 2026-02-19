@@ -10,7 +10,7 @@ type Props = {
 
 export default function CitySearch({ onSelectCity }: Props) {
   const [inputValue, setInputValue] = useState("");
-  const debounced = useDebouncedValue(inputValue, 400);
+  const debounced = useDebouncedValue(inputValue, 200);
 
   const { data, isFetching, isError } = useCitySearch(debounced);
 
@@ -37,8 +37,13 @@ export default function CitySearch({ onSelectCity }: Props) {
       options={options}
       loading={isFetching}
       getOptionLabel={getLabel}
-      filterOptions={(x) => x} 
-
+      filterOptions={(x) => x}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
+      renderOption={(props, option) => (
+        <li {...props} key={option.id}>
+          {getLabel(option)}
+        </li>
+      )}
       noOptionsText={
         debounced.trim().length < 2
           ? "Kezdjen el gépelni..."

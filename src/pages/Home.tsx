@@ -3,7 +3,7 @@ import { Container, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import CurrentWeather from '../components/CurrentWeather/CurrentWeather'
-import WeeklyForecast from '../components/WeeklyForecast/Weeklyforecast'
+import WeeklyForecast from '../components/WeeklyForecast/WeeklyForecast'
 import ForecastChart from "../components/ForecastChart/ForecastChart";
 import { useLocalStorageState } from '../hooks/useLocalStorageState'
 import { useForecast } from '../hooks/useForecast'
@@ -49,7 +49,7 @@ const Home = () => {
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 8 }}>
+          <Grid size={{ xs: 12, md: 8 }} sx={{ minWidth: 0 }}>
             <Box sx={{ color: '#fff' }}>
               <WeeklyForecast
               forecast={data}

@@ -1,18 +1,9 @@
 import { Box, Typography } from "@mui/material";
-import type { FC } from "react";
 import { weatherCodeToIcon } from "./WeatherIcons";
+import { dayName } from "../../utils/dayName";
+import type { Forecast } from "../../types/ForecastTypes";
+import type { FC } from "react";
 
-type DailyForecast = {
-  time: string[];
-  weather_code?: number[];
-  precipitation_probability_max?: number[];
-  temperature_2m_min?: number[];
-  temperature_2m_max?: number[];
-};
-
-type Forecast = {
-  daily?: DailyForecast;
-};
 
 type Props = {
   forecast: Forecast | undefined;
@@ -20,11 +11,6 @@ type Props = {
   isError: boolean;
 };
 
-function dayName(dateStr: string) {
-  const d = new Date(dateStr);
-  const name = d.toLocaleDateString("hu-HU", { weekday: "long" });
-  return name.charAt(0).toUpperCase() + name.slice(1).toUpperCase();
-}
 
 const WeeklyForecast: FC<Props> = ({ forecast, isLoading, isError }) => {
   if (isLoading) {
@@ -75,7 +61,7 @@ const WeeklyForecast: FC<Props> = ({ forecast, isLoading, isError }) => {
                 py: 1.6,
               }}
             >
-              {/* Bal blokk: nap + állapot */}
+              {/* nap + állapot */}
               <Box sx={{ display: "flex", alignItems: "baseline", gap: 1.2, minWidth: 0, flex: 1 }}>
                 <Typography
                   fontFamily="inter"
@@ -88,7 +74,7 @@ const WeeklyForecast: FC<Props> = ({ forecast, isLoading, isError }) => {
                
               </Box>
 
-              {/* Ikon */}
+              {/* Ikon + csapadék */}
               <Box sx={{ display: "flex", justifyContent: "left", gap: 1, textAlign:"left" }}>
                 {weatherCodeToIcon(r.code, { sx: { fontSize: 18 } })}
                   <Typography
@@ -99,8 +85,6 @@ const WeeklyForecast: FC<Props> = ({ forecast, isLoading, isError }) => {
                   {r.precip != null ? `${r.precip}%` : "—"}
                 </Typography>
               </Box>
-
-              {/* Csapadék */}
               
 
               {/* Min/Max */}
